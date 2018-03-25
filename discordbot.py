@@ -9,6 +9,7 @@ import logging
 import logging.handlers
 import sys
 import os
+from hashlib import sha256
 
 # Deafults
 LOG_FILENAME = "/tmp/discordbot.log"
@@ -45,7 +46,9 @@ def writeToDatabase(name, iv, cp, lvl, location, timestamp):
         try:
             cur.execute('select id from pokemon where name = "%s"' % name.lower())
             id = cur.fetchone()[0]
-            cur.execute('insert into encounters values(?, ?, ?, ?, ?, ?, ?)', (id, timestamp, location[0], location[1], iv, cp, lvl))
+            m = sha256()
+            m.update('{0}{1}{2}{3}{4}{5}{6}'.format(id, timestamp, location[0], location[1], iv, cp, lvl).encode())
+            cur.execute('insert into encounters values(?, ?, ?, ?, ?, ?, ?, ?)', (id, timestamp, location[0], location[1], iv, cp, lvl, m.hexdigest()))
         except sqlite3.IntegrityError:
             pass
         con.commit()

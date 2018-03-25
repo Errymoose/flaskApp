@@ -15,7 +15,14 @@ module.exports = {
       {
         test: /\.(js)$/,
         exclude: /node_modules/,
-        use: ['babel-loader']
+        use: [
+          {
+            loader: 'babel-loader',
+            query  :{
+              presets:['react','es2015']
+          }
+          }
+        ]
       },
       {
         test: /\.css$/,
@@ -35,11 +42,6 @@ module.exports = {
       }
     ]
   },
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: 'dist/index.html',
-    })
-  ],
   devServer: {
     host: 'localhost',
     port: port,

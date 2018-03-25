@@ -10,8 +10,8 @@
 # Description:       Listens to the SydneyPogoMap discord channel and logs stuff to sqlite.
 ### END INIT INFO
 DIR=/home/root/discordbot
-DAEMON=$DIR/discordbot.py
-DAEMON_NAME=discordbot
+DAEMON=$DIR/flaskApp.py
+DAEMON_NAME=flaskApp
 
 DAEMON_OPTS=""
 DAEMON_USER=root

@@ -1,11 +1,15 @@
+#!/usr/bin/python3
+
 from __future__ import print_function
 import sys
 import sqlite3
 import os
 from flask import Flask, request
+from flask_cors import CORS
 import json
 
 app = Flask(__name__)
+CORS(app)
 
 class Map(object):
     def __init__(self, isHeatmap = False):
@@ -21,46 +25,62 @@ class Map(object):
         else:
             centerLat = -33.8805995
             centerLon = 150.9983954
-        
+
         markersCode = "\n".join(
-            [ """new google.maps.Marker({{
-                position: new google.maps.LatLng({lat}, {lon}),
-                map: map,
-                title: '{name} - {iv}% iv - {cp} CP - Level {lvl}' 
-                }});""".format(lat=x[0], lon=x[1], name=x[2], iv=x[3], cp=x[4], lvl=x[5]) for x in self._points
+            [ """{{\n
+                "lat": "{lat}",\n
+                "lon": "{lon}",\n
+                "name": "{name}",\n
+                "iv": "{iv}",\n
+                "cp": "{cp}",\n
+                "lvl": "{lvl}"\n
+                }},\n""".format(lat=x[0], lon=x[1], name=x[2], iv=x[3], cp=x[4], lvl=x[5]) for x in self._points
             ])
+        return '{\n"markers" : [\n' + markersCode[:-2] + '\n]\n}'            
         
-        points = "\n".join(
-            [
-                ''' new google.maps.LatLng({lat}, {lon}), '''.format(lat=x[0], lon=x[1]) for x in self._points
-            ])
+        # markersCode = "\n".join(
+        #     [ """new google.maps.Marker({{
+        #         position: new google.maps.LatLng({lat}, {lon}),
+        #         map: map,
+        #         title: '{name} - {iv}% iv - {cp} CP - Level {lvl}' 
+        #         }});""".format(lat=x[0], lon=x[1], name=x[2], iv=x[3], cp=x[4], lvl=x[5]) for x in self._points
+        #     ])
+        
+        # heatmapData = '\n'.join(
+        #     [                
+        #         '{{ location: new google.maps.LatLng({lat}, {lon}), weight: 1 }},'.format(lat=x[0], lon=x[1]) for x in self._points
+        #     ])
 
-        heatmapCode = '''
-            var heatmapData = [
-                ''' + points + '''
-            ];
-            var heatmap = new google.maps.visualization.HeatmapLayer({
-                data: heatmapData,
-                radius: 20,
-            });
-            heatmap.setMap(map);'''
+        # print(heatmapData[1:-1])
 
-        return """
-            <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDL9B_RTJE3WI1Eqqt9TOoCbSVRCnhjFL4&libraries=visualization"></script>
-            <div id="map-canvas" style="height: 100%; width: 100%"></div>
-            <script type="text/javascript">
-                var map;
-                function show_map() {{
-                    map = new google.maps.Map(document.getElementById("map-canvas"), {{
-                        zoom: 12,
-                        center: new google.maps.LatLng({centerLat}, {centerLon})
-                    }});
-                    {mapcode}
-                }};
-                google.maps.event.addDomListener(window, 'load', show_map);
-            </script>
-        """.format(centerLat=centerLat, centerLon=centerLon,
-         mapcode=heatmapCode if self._isHeatmap else markersCode)
+        # heatmapCode = '''
+        #     let heatmapData = [
+        #         ''' + heatmapData[:-1] + '''
+        #     ];
+        #     let heatmap = new google.maps.visualization.HeatmapLayer({
+        #         data: heatmapData,
+        #         radius: 20,
+        #     });
+        #     heatmap.setMap(map);'''
+
+        # print(heatmapCode)
+
+        # return """
+        #     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDL9B_RTJE3WI1Eqqt9TOoCbSVRCnhjFL4&libraries=visualization"></script>
+        #     <div id="map-canvas" style="height: 100%; width: 100%"></div>
+        #     <script type="text/javascript">
+        #         var map;
+        #         function show_map() {{
+        #             map = new google.maps.Map(document.getElementById("map-canvas"), {{
+        #                 zoom: 12,
+        #                 center: new google.maps.LatLng({centerLat}, {centerLon})
+        #             }});
+        #             {mapcode}
+        #         }};
+        #         google.maps.event.addDomListener(window, 'load', show_map);
+        #     </script>
+        # """.format(centerLat=centerLat, centerLon=centerLon,
+        #  mapcode=heatmapCode if self._isHeatmap else markersCode)
 
 
 def findPokemonByName(cur, name):
