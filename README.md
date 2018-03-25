@@ -1,7 +1,7 @@
 # flaskApp
 
-The maps are currently being hosted from flask on my VPS at:
-http://john-medusa.bnr.la:5000/heatmap/geodude?iv_limit=100
+The maps are currently being hosted from apache/flask on my VPS at:
+http://john-medusa.bnr.la/index.html
 
-you can use any pokemon name, map or heatmap interface, and apply combinations of filters...
-http://john-medusa.bnr.la:5000/map/dratini?iv_limit=70&cp_limit=100&lvl_limit=10
+it has a UI to select your pokemon and apply filtering based on combat power, 
+level, and invidual value % rating.
